@@ -1,22 +1,49 @@
 package main
 
 import (
-	"unsafe"
+	"fmt"
+	"os"
+
+	"github.com/antonmamonov/gounsafescanner/dummyapp"
+	"github.com/antonmamonov/gounsafescanner/pointerscan"
+	"github.com/antonmamonov/gounsafescanner/pointertest"
 )
 
+func help() {
+	fmt.Println("-----------------------")
+	fmt.Println("go run main.go dummyapp")
+	fmt.Println("go run main.go pointertest")
+	fmt.Println("go run main.go pointerscan")
+	fmt.Println("-----------------------")
+}
+
 func main() {
-	vals := []int{7, 12, 9, 5, 2, 14, 3}
 
-	ptrStart := unsafe.Pointer(&vals[0])
-	itemSize := unsafe.Sizeof(vals[0])
-
-	println(ptrStart)
-	println(itemSize)
-
-	for i := 0; i < len(vals); i++ {
-		println("ptrStart", ptrStart)
-		println("ptrAdded", unsafe.Add(ptrStart, uintptr(i)*itemSize))
-		item := *(*int)(unsafe.Add(ptrStart, uintptr(i)*itemSize))
-		println(item)
+	if len(os.Args) < 2 {
+		panic("Please give an argument to select the submodule. If confused type 'go run main.go help'")
 	}
+
+	subModule := os.Args[1]
+
+	if subModule == "help" {
+		help()
+		return
+	}
+
+	if subModule == "pointertest" {
+		pointertest.TestUnsafePointers()
+		return
+	}
+
+	if subModule == "dummyapp" {
+		dummyapp.MainRunDummyApp()
+		return
+	}
+
+	if subModule == "pointerscan" {
+		pointerscan.BeginBasicPointerScannerForInt(13371337)
+		return
+	}
+
+	fmt.Println("Not a valid command. If confused type 'go run main.go help'")
 }
